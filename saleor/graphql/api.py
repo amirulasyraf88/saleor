@@ -50,7 +50,7 @@ from .shipping.mutations import (
     ShippingPriceCreate, ShippingPriceDelete, ShippingPriceUpdate)
 from .utils import get_node
 from .checkout.types import CheckoutLine, Checkout
-from .checkout.mutations import CheckoutLineCreate, CheckoutCreate
+from .checkout.mutations import CheckoutCreate, CheckoutLinesAdd
 from .checkout.resolvers import resolve_checkouts
 from .shop.types import Shop
 from .shop.mutations import (
@@ -269,7 +269,7 @@ class Mutations(ProductMutations):
     address_delete = AddressDelete.Field()
 
     checkout_create = CheckoutCreate.Field()
-    checkout_line_create = CheckoutLineCreate.Field()
+    checkout_lines_add = CheckoutLinesAdd.Field()
 
     menu_create = MenuCreate.Field()
     menu_delete = MenuDelete.Field()
