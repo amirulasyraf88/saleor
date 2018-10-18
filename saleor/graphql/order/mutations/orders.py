@@ -7,6 +7,7 @@ from ....order import CustomPaymentChoices, OrderEvents, models
 from ....order.utils import cancel_order
 from ....payment import ChargeStatus, PaymentError
 from ....payment.models import PaymentMethod
+from ....payment.utils import get_billing_data
 from ....shipping.models import ShippingMethod as ShippingMethodModel
 from ...account.types import AddressInput
 from ...core.mutations import BaseMutation
@@ -288,9 +289,9 @@ class OrderMarkAsPaid(BaseMutation):
         clean_order_mark_as_paid(order, errors)
         if errors:
             return OrderMarkAsPaid(errors=errors)
-        # FIXME add more fields to the payment method
         defaults = {
-            'total': order.total, 'captured_amount': order.total.gross}
+            'total': order.total, 'captured_amount': order.total.gross,
+            **get_billing_data(order)}
         PaymentMethod.objects.get_or_create(
             variant=CustomPaymentChoices.MANUAL,
             charge_status=ChargeStatus.CHARGED, order=order,

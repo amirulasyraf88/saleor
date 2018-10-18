@@ -20,6 +20,7 @@ from ...order.utils import (
     change_order_line_quantity, recalculate_order)
 from ...payment import ChargeStatus, PaymentError
 from ...payment.models import PaymentMethod
+from ...payment.utils import get_billing_data
 from ...product.models import Product, ProductVariant
 from ...product.utils import allocate_stock, deallocate_stock
 from ...shipping.models import ShippingMethod
@@ -352,10 +353,10 @@ class OrderMarkAsPaidForm(forms.Form):
                     'Orders with payments can not be manually marked as paid'))
 
     def save(self):
-        # FIXME add more fields to the payment method
         defaults = {
             'total': self.order.total,
-            'captured_amount': self.order.total.gross}
+            'captured_amount': self.order.total.gross,
+            **get_billing_data(order)}
         PaymentMethod.objects.get_or_create(
             variant=CustomPaymentChoices.MANUAL,
             charge_status=ChargeStatus.CHARGED, order=self.order,

@@ -28,6 +28,7 @@ from ...order.models import Fulfillment, Order
 from ...order.utils import update_order_status
 from ...page.models import Page
 from ...payment import ChargeStatus, TransactionType
+from ...payment.utils import get_billing_data
 from ...payment.models import PaymentMethod
 from ...product.models import (
     Attribute, AttributeValue, Category, Collection, Product, ProductImage,
@@ -408,19 +409,12 @@ def create_payment(order):
             ChargeStatus.CHARGED,
             ChargeStatus.NOT_CHARGED])
     payment = PaymentMethod.objects.create(
-        order=order,
         charge_status=status,
         variant='default',
-        total=order.total,
         customer_ip_address=fake.ipv4(),
-        billing_first_name=order.billing_address.first_name,
-        billing_last_name=order.billing_address.last_name,
-        billing_address_1=order.billing_address.street_address_1,
-        billing_address_2=order.billing_address.street_address_2,
-        billing_city=order.billing_address.city,
-        billing_postal_code=order.billing_address.postal_code,
-        billing_country_code=order.billing_address.country,
-        billing_country_area=order.billing_address.country_area)
+        order=order,
+        total=order.total,
+        **get_billing_data(order))
     if status == ChargeStatus.CHARGED:
         payment.captured_amount = payment.total.gross
         payment.save()

@@ -21,13 +21,13 @@ class PaymentMethod(models.Model):
     Payment methods belong to a customer, one can use several payments method
     within a single order.
     """
+    # FIXME probably we should have error/pending/active status
+
     variant = models.CharField(max_length=255)
-    # FIXME probably we should have error/pending/active status instead of
-    # a bool
+    # FIXME it's is_authorized but it's called is_active which
+    # might be misleading
     is_active = models.BooleanField(default=True)
-    #: Creation date and time
     created = models.DateTimeField(auto_now_add=True)
-    #: Date and time of last modification
     modified = models.DateTimeField(auto_now=True)
     charge_status = models.CharField(
         max_length=15,

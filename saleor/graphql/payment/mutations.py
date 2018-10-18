@@ -59,8 +59,6 @@ class CheckoutPaymentMethodCreate(BaseMutation):
         if input['billing_address']:
             billing_data = cls.clean_billing_address(input['billing_address'])
 
-        # create payment method
-        # FIXME should take amount and tax into the consideration
         gross = Money(input['amount'], currency=settings.DEFAULT_CURRENCY)
         tax = Money(input['amount'], currency=settings.DEFAULT_CURRENCY)
         net = (gross - tax) or gross
