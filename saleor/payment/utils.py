@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def get_billing_data(order):
     data = {}
-    if order.billing_address
+    if order.billing_address:
         data = {
             'billing_first_name': order.billing_address.first_name,
             'billing_last_name': order.billing_address.last_name,

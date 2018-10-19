@@ -204,7 +204,7 @@ class Order(CountableDjangoObjectType):
     @staticmethod
     @gql_optimizer.resolver_hints(prefetch_related='payments')
     def resolve_total_authorized(obj, info):
-        # FIXME adjust to multiple payments
+        # FIXME adjust to multiple payments in the future
         payment = obj.get_last_payment()
         if payment:
             return payment.total.gross
@@ -212,7 +212,7 @@ class Order(CountableDjangoObjectType):
     @staticmethod
     @gql_optimizer.resolver_hints(prefetch_related='payments')
     def resolve_total_captured(obj, info):
-        # FIXME adjust to multiple payments
+        # FIXME adjust to multiple payments in the future
         payment = obj.get_last_payment()
         if payment:
             return payment.captured_amount
