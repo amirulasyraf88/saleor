@@ -356,7 +356,7 @@ class OrderMarkAsPaidForm(forms.Form):
         defaults = {
             'total': self.order.total,
             'captured_amount': self.order.total.gross,
-            **get_billing_data(order)}
+            **get_billing_data(self.order)}
         PaymentMethod.objects.get_or_create(
             variant=CustomPaymentChoices.MANUAL,
             charge_status=ChargeStatus.CHARGED, order=self.order,
