@@ -1247,7 +1247,6 @@ input PaymentMethodInput {
   tax: Decimal!
   amount: Decimal!
   billingAddress: AddressInput
-  storePaymentMethod: Boolean = false
 }
 
 type PaymentMethodRefund {
