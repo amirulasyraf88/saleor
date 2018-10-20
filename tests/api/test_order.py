@@ -909,7 +909,7 @@ def test_order_capture(
         }
     """
     order_id = graphene.Node.to_global_id('Order', order.id)
-    amount = float(payment_method_txn_preauth.total.gross.amount)
+    amount = float(payment_method_txn_preauth.total.amount)
     variables = {'id': order_id, 'amount': amount}
     response = staff_api_client.post_graphql(
         query, variables, permissions=[permission_manage_orders])
@@ -1035,7 +1035,7 @@ def test_order_refund(
         }
     """
     order_id = graphene.Node.to_global_id('Order', order.id)
-    amount = float(payment_method_txn_captured.total.gross.amount)
+    amount = float(payment_method_txn_captured.total.amount)
     variables = {'id': order_id, 'amount': amount}
     response = staff_api_client.post_graphql(
         query, variables, permissions=[permission_manage_orders])

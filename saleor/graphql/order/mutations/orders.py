@@ -290,7 +290,7 @@ class OrderMarkAsPaid(BaseMutation):
         if errors:
             return OrderMarkAsPaid(errors=errors)
         defaults = {
-            'total': order.total, 'captured_amount': order.total.gross,
+            'total': order.total.gross, 'captured_amount': order.total.gross,
             **get_billing_data(order)}
         PaymentMethod.objects.get_or_create(
             variant=CustomPaymentChoices.MANUAL,

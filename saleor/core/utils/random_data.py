@@ -382,21 +382,21 @@ def create_transactions(payment):
     # FIXME Add tests for this function
     payment.transactions.create(
         transaction_type=TransactionType.AUTH,
-        is_success=True, amount=payment.total.gross, gateway_response={})
+        is_success=True, amount=payment.total, gateway_response={})
     if payment.charge_status == ChargeStatus.NOT_CHARGED:
         if random.randint(0, 1):
             payment.transactions.create(
                 transaction_type=TransactionType.VOID,
-                is_success=True, amount=payment.total.gross,
+                is_success=True, amount=payment.total,
                 gateway_response={})
         return
     payment.transactions.create(
         transaction_type=TransactionType.CAPTURE,
-        is_success=True, amount=payment.total.gross, gateway_response={})
+        is_success=True, amount=payment.total, gateway_response={})
     if payment.charge_status == ChargeStatus.FULLY_REFUNDED:
             payment.transactions.create(
                 transaction_type=TransactionType.REFUND,
-                is_success=True, amount=payment.total.gross,
+                is_success=True, amount=payment.total,
                 gateway_response={})
     return payment
 
@@ -413,10 +413,10 @@ def create_payment(order):
         variant='default',
         customer_ip_address=fake.ipv4(),
         order=order,
-        total=order.total,
+        total=order.total.gross,
         **get_billing_data(order))
     if status == ChargeStatus.CHARGED:
-        payment.captured_amount = payment.total.gross
+        payment.captured_amount = payment.total
         payment.save()
     create_transactions(payment)
     return payment
