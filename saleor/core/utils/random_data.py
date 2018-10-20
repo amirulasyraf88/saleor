@@ -29,7 +29,7 @@ from ...order.utils import update_order_status
 from ...page.models import Page
 from ...payment import ChargeStatus, TransactionType
 from ...payment.utils import get_billing_data
-from ...payment.models import PaymentMethod
+from ...payment.models import Payment
 from ...product.models import (
     Attribute, AttributeValue, Category, Collection, Product, ProductImage,
     ProductType, ProductVariant)
@@ -408,10 +408,11 @@ def create_payment(order):
             ChargeStatus.FULLY_REFUNDED,
             ChargeStatus.CHARGED,
             ChargeStatus.NOT_CHARGED])
-    payment = PaymentMethod.objects.create(
+    payment = Payment.objects.create(
         charge_status=status,
         variant='default',
         customer_ip_address=fake.ipv4(),
+        is_active=True,
         order=order,
         total=order.total.gross,
         **get_billing_data(order))
