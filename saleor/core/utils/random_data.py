@@ -28,8 +28,8 @@ from ...order.models import Fulfillment, Order
 from ...order.utils import update_order_status
 from ...page.models import Page
 from ...payment import ChargeStatus, TransactionType
-from ...payment.utils import get_billing_data
 from ...payment.models import Payment
+from ...payment.utils import get_billing_data
 from ...product.models import (
     Attribute, AttributeValue, Category, Collection, Product, ProductImage,
     ProductType, ProductVariant)
