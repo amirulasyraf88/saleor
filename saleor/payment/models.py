@@ -26,8 +26,9 @@ class Payment(models.Model):
     # FIXME probably we should have error/pending/active status
 
     variant = models.CharField(max_length=255)
-    # FIXME it's is_active but it's called is_active which
-    # might be misleading
+    # FIXME This field is used for setting payment as active
+    # (open for modification) therefore - authorized, not sure if that's clear
+    # enough
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
