@@ -36,7 +36,7 @@ from .order.mutations.fulfillments import (
     FulfillmentCancel, FulfillmentCreate, FulfillmentUpdateTracking)
 from .order.mutations.orders import (
     OrderAddNote, OrderCancel, OrderCapture, OrderMarkAsPaid, OrderRefund,
-    OrderRelease, OrderUpdate, OrderUpdateShipping)
+    OrderVoid, OrderUpdate, OrderUpdateShipping)
 from .page.resolvers import resolve_pages, resolve_page
 from .page.types import Page
 from .page.mutations import PageCreate, PageDelete, PageUpdate
@@ -325,7 +325,7 @@ class Mutations(ProductMutations):
     order_mark_as_paid = OrderMarkAsPaid.Field()
     order_update_shipping = OrderUpdateShipping.Field()
     order_refund = OrderRefund.Field()
-    order_release = OrderRelease.Field()
+    order_void = OrderVoid.Field()
     order_update = OrderUpdate.Field()
 
     page_create = PageCreate.Field()
