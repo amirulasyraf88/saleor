@@ -27,9 +27,11 @@ from ...menu.models import Menu
 from ...order.models import Fulfillment, Order
 from ...order.utils import update_order_status
 from ...page.models import Page
-from ...payment import ChargeStatus, TransactionType
+from ...payment import ChargeStatus, TransactionType, get_provider
 from ...payment.models import Payment
-from ...payment.utils import get_billing_data
+from ...payment.utils import (
+    gateway_authorize, gateway_capture, gateway_refund, gateway_void,
+    get_billing_data)
 from ...product.models import (
     Attribute, AttributeValue, Category, Collection, Product, ProductImage,
     ProductType, ProductVariant)
@@ -378,48 +380,31 @@ def create_fake_user():
     return user
 
 
-def create_transactions(payment):
-    # FIXME Add tests for this function
-    payment.transactions.create(
-        transaction_type=TransactionType.AUTH,
-        is_success=True, amount=payment.total, gateway_response={})
-    if payment.charge_status == ChargeStatus.NOT_CHARGED:
-        if random.randint(0, 1):
-            payment.transactions.create(
-                transaction_type=TransactionType.VOID,
-                is_success=True, amount=payment.total,
-                gateway_response={})
-        return
-    payment.transactions.create(
-        transaction_type=TransactionType.CAPTURE,
-        is_success=True, amount=payment.total, gateway_response={})
-    if payment.charge_status == ChargeStatus.FULLY_REFUNDED:
-            payment.transactions.create(
-                transaction_type=TransactionType.REFUND,
-                is_success=True, amount=payment.total,
-                gateway_response={})
-    return payment
-
-
 def create_payment(order):
-    # FIXME Add tests for this function
-    status = random.choice(
-        [
-            ChargeStatus.FULLY_REFUNDED,
-            ChargeStatus.CHARGED,
-            ChargeStatus.NOT_CHARGED])
     payment = Payment.objects.create(
-        charge_status=status,
-        variant='default',
+        variant=settings.DUMMY,
         customer_ip_address=fake.ipv4(),
-        is_active=True,
         order=order,
         total=order.total.gross,
         **get_billing_data(order))
-    if status == ChargeStatus.CHARGED:
-        payment.captured_amount = payment.total
-        payment.save()
-    create_transactions(payment)
+
+    provider, provider_params = get_provider(payment.variant)
+    transaction_token = provider.get_transaction_token(**provider_params)
+
+    # Create authorization transaction
+    gateway_authorize(payment, transaction_token, **provider_params)
+    # 20% chance to void the transaction at this stage
+    if random.choice([0, 0, 0, 0, 1]):
+        gateway_void(payment, **provider_params)
+        return payment
+    # 25% to end the payment at the authorization stage
+    if not random.choice([1, 1, 1, 0]):
+        return payment
+    # Create capture transaction
+    gateway_capture(payment, payment.total.amount, **provider_params)
+    # 25% to refund the payment
+    if random.choice([0, 0, 0, 1]):
+        gateway_refund(payment, payment.total.amount, **provider_params)
     return payment
 
 
@@ -446,6 +431,9 @@ def create_order_lines(order, discounts, taxes, how_many=10):
 
 
 def create_fulfillments(order):
+    if order.get_last_payment_status() == ChargeStatus.NOT_CHARGED:
+        update_order_status(order)
+        return
     for line in order:
         if random.choice([False, True]):
             fulfillment, _ = Fulfillment.objects.get_or_create(order=order)
@@ -492,9 +480,8 @@ def create_fake_order(discounts, taxes):
     order.weight = weight
     order.save()
 
-    create_fulfillments(order)
-
     create_payment(order)
+    create_fulfillments(order)
     return order
 
 
