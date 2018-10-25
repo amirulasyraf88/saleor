@@ -1665,12 +1665,14 @@ scalar Upload
 
 type User implements Node {
   id: ID!
+  lastLogin: DateTime
   email: String!
   addresses(before: String, after: String, first: Int, last: Int): AddressCountableConnection
   isStaff: Boolean!
   token: UUID!
   isActive: Boolean!
   note: String
+  dateJoined: DateTime!
   defaultShippingAddress: Address
   defaultBillingAddress: Address
   orders(before: String, after: String, first: Int, last: Int): OrderCountableConnection
